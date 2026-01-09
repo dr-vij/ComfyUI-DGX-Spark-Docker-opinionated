@@ -7,3 +7,9 @@ hf_cache/*
 
 venv/*
 !venv/.gitkeep
+
+custom_nodes/*
+!custom_nodes/.gitkeep
+!custom_nodes/custom_nodes.txt
+!custom_nodes/websocket_image_save.py
+!custom_nodes/example_node.py.example

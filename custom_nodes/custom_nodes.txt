@@ -1,0 +1,17 @@
+# ComfyUI Custom Nodes
+# Each line is a git repository URL to clone
+
+https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git
+https://github.com/ubisoft/ComfyUI-Chord.git
+https://github.com/phaserblast/ComfyUI-DGXSparkSafetensorsLoader.git
+https://github.com/city96/ComfyUI-GGUF.git
+https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git
+https://github.com/kijai/ComfyUI-KJNodes.git
+https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git
+https://github.com/kijai/ComfyUI-segment-anything-2.git
+https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
+https://github.com/comfyanonymous/ComfyUI_TensorRT.git
+https://github.com/Fannovel16/comfyui_controlnet_aux.git
+
+# ComfyUI Manager - recommended for managing custom nodes via GUI
+https://github.com/ltdrdata/ComfyUI-Manager.git

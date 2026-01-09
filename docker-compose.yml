@@ -8,8 +8,10 @@ services:
     volumes:
       - ./hf_cache:/workspace/cache/huggingface
       - ./ComfyUI:/workspace/ComfyUI
-      - ../ComfyModels:/workspace/ComfyUI/models
+      - ../ComfyUI/models:/workspace/ComfyUI/models
+#      - ../ComfyModels:/workspace/ComfyUI/models
       - ./venv:/workspace/venv
+      - ./custom_nodes:/workspace/ComfyUI/custom_nodes
     deploy:
       resources:
         reservations:
