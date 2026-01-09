@@ -1,0 +1,30 @@
+services:
+  comfy:
+    build: .
+    container_name: comfyui
+    user: "${UID}:${GID}"
+    ports:
+      - "${COMFY_PORT:-8188}:${COMFY_PORT:-8188}"
+    volumes:
+      - ./hf_cache:/workspace/cache/huggingface
+      - ./ComfyUI:/workspace/ComfyUI
+      - ../ComfyModels:/workspace/ComfyUI/models
+      - ./venv:/workspace/venv
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      HF_HOME: /workspace/cache/huggingface
+      COMFY_PORT: ${COMFY_PORT:-8188}
+    env_file:
+      - .env
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+

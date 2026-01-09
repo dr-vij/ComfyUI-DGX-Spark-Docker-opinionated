@@ -1,0 +1,9 @@
+.idea/
+ComfyUI/
+.env
+
+hf_cache/*
+!hf_cache/.gitkeep
+
+venv/*
+!venv/.gitkeep
