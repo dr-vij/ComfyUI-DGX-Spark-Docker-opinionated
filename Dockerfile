@@ -9,11 +9,15 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     git \
     ninja-build \
+    cmake \
+    build-essential \
     libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxrender1 \
     libxext6 \
+    libcudnn9-dev-cuda-13 \
+    cuda-cccl-13-0 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV CUDA_HOME=/usr/local/cuda-13.0
@@ -22,15 +26,45 @@ ENV LD_LIBRARY_PATH="$CUDA_HOME/lib64:${LD_LIBRARY_PATH}"
 ENV LIBRARY_PATH="$CUDA_HOME/targets/sbsa-linux/lib:${LIBRARY_PATH}"
 ENV TORCH_CUDA_ARCH_LIST="12.1+PTX"
 
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130 --break-system-packages
+# Add CCCL headers path (libcudacxx) so CUTLASS can find cuda/std/* headers
+# cuda-cccl package installs to targets/sbsa-linux/include
+ENV CPLUS_INCLUDE_PATH="/usr/local/cuda-13.0/targets/sbsa-linux/include:${CPLUS_INCLUDE_PATH}"
+ENV C_INCLUDE_PATH="/usr/local/cuda-13.0/targets/sbsa-linux/include:${C_INCLUDE_PATH}"
 
-# Set working directory
+# Build onnxruntime-gpu from source for CUDA 13.0
+# Only build the wheel, install happens in entrypoint to use mounted venv
+WORKDIR /tmp/onnxruntime-build
+RUN pip3 install --break-system-packages cmake ninja packaging "numpy>=2.0" && \
+    git clone --recursive --depth 1 https://github.com/microsoft/onnxruntime.git && \
+    cd onnxruntime && \
+    export CXXFLAGS="-I/usr/local/cuda-13.0/targets/sbsa-linux/include $CXXFLAGS" && \
+    export CFLAGS="-I/usr/local/cuda-13.0/targets/sbsa-linux/include $CFLAGS" && \
+    ./build.sh --config Release \
+        --build_dir build/cuda13 \
+        --build_wheel \
+        --use_cuda \
+        --cuda_home /usr/local/cuda-13.0 \
+        --cudnn_home /usr/local/cuda-13.0 \
+        --cuda_version 13.0 \
+        --parallel 6 \
+        --nvcc_threads 1 \
+        --skip_tests \
+        --allow_running_as_root \
+        --cmake_generator Ninja \
+        --use_binskim_compliant_compile_flags \
+        --cmake_extra_defines CMAKE_CUDA_ARCHITECTURES="121" \
+            onnxruntime_BUILD_UNIT_TESTS=OFF \
+            CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES="/usr/local/cuda-13.0/targets/sbsa-linux/include" && \
+    mkdir -p /opt/onnxruntime && \
+    cp build/cuda13/Release/dist/onnxruntime_gpu-*.whl /opt/onnxruntime/ && \
+    cd / && rm -rf /tmp/onnxruntime-build
+
+# Venv will be created at runtime in mounted volume
+ENV VENV_PATH="/workspace/venv"
+ENV PATH="${VENV_PATH}/bin:${PATH}"
+
 WORKDIR /workspace
 
-# Set PATH for venv (venv will be created at runtime in entrypoint)
-ENV PATH="/workspace/venv/bin:$PATH"
-
-# Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

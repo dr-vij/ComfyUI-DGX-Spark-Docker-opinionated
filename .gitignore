@@ -8,6 +8,12 @@ hf_cache/*
 venv/*
 !venv/.gitkeep
 
+pip_cache/*
+!pip_cache/.gitkeep
+
+ultralytics_cache/*
+!ultralytics_cache/.gitkeep
+
 custom_nodes/*
 !custom_nodes/.gitkeep
 !custom_nodes/custom_nodes.txt

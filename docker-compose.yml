@@ -6,11 +6,12 @@ services:
     ports:
       - "${COMFY_PORT:-8188}:${COMFY_PORT:-8188}"
     volumes:
+      - ./venv:/workspace/venv
+      - ./pip_cache:/workspace/pip_cache
       - ./hf_cache:/workspace/cache/huggingface
+      - ./ultralytics_cache:/workspace/cache/ultralytics
       - ./ComfyUI:/workspace/ComfyUI
       - ../ComfyUI/models:/workspace/ComfyUI/models
-#      - ../ComfyModels:/workspace/ComfyUI/models
-      - ./venv:/workspace/venv
       - ./custom_nodes:/workspace/ComfyUI/custom_nodes
     deploy:
       resources:
@@ -23,6 +24,8 @@ services:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
       HF_HOME: /workspace/cache/huggingface
+      PIP_CACHE_DIR: /workspace/pip_cache
+      YOLO_CONFIG_DIR: /workspace/cache/ultralytics
       COMFY_PORT: ${COMFY_PORT:-8188}
     env_file:
       - .env
