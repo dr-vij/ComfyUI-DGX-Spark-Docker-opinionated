@@ -6,13 +6,19 @@ services:
     ports:
       - "${COMFY_PORT:-8188}:${COMFY_PORT:-8188}"
     volumes:
+#     inner data, be careful not to wipe it with git clean. but it is not very important and can be reinited
       - ./venv:/workspace/venv
       - ./pip_cache:/workspace/pip_cache
       - ./hf_cache:/workspace/cache/huggingface
       - ./ultralytics_cache:/workspace/cache/ultralytics
       - ./ComfyUI:/workspace/ComfyUI
-      - ../ComfyUI/models:/workspace/ComfyUI/models
       - ./custom_nodes:/workspace/ComfyUI/custom_nodes
+
+#     comfy user data: models, templates, input and output. stored separately to protect from accidental deletion
+      - ../ComfyData/models:/workspace/ComfyUI/models
+      - ../ComfyData/user:/workspace/ComfyUI/user
+      - ../ComfyData/input:/workspace/ComfyUI/input
+      - ../ComfyData/output:/workspace/ComfyUI/output
     deploy:
       resources:
         reservations:
