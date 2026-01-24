@@ -16,6 +16,7 @@ https://github.com/kijai/ComfyUI-segment-anything-2.git
 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
 https://github.com/filliptm/ComfyUI_Fill-Nodes.git
 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite
+https://github.com/Lightricks/ComfyUI-LTXVideo/
 
 https://github.com/Fannovel16/comfyui_controlnet_aux.git
 

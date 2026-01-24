@@ -1,6 +1,7 @@
 #!/bin/bash
 
 VENV_PATH="/workspace/venv"
+CONSTRAINTS_FILE="/workspace/constraints.txt"
 
 # Create venv if not exists (first run only)
 if [ ! -f "$VENV_PATH/bin/activate" ]; then
@@ -10,9 +11,46 @@ fi
 
 # Update base packages (every run)
 echo "Checking/updating base packages..."
+export PIP_CONSTRAINT="$CONSTRAINTS_FILE"
 pip install --upgrade pip
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
+pip install torch torchvision torchaudio --pre --index-url https://download.pytorch.org/whl/cu130
 pip install sageattention || true
+
+# Backup built wheels into mounted directory (update if missing or different)
+WHEELS_BACKUP_DIR="/workspace/SelfBuiltWheels"
+if ! mkdir -p "$WHEELS_BACKUP_DIR"; then
+    echo "ERROR: cannot create backup dir: $WHEELS_BACKUP_DIR" >&2
+fi
+sync_wheel() {
+    src="$1"
+    subdir="$2"
+    [ -f "$src" ] || return
+    dst_dir="$WHEELS_BACKUP_DIR/$subdir"
+    if ! mkdir -p "$dst_dir"; then
+        echo "ERROR: cannot create dir: $dst_dir" >&2
+        return 1
+    fi
+    dst="$dst_dir/$(basename "$src")"
+    if [ ! -f "$dst" ] || ! cmp -s "$src" "$dst"; then
+        echo "Backing up wheel: $(basename "$src")"
+        if ! cp -f "$src" "$dst"; then
+            echo "ERROR: cannot copy $src to $dst" >&2
+            return 1
+        fi
+    fi
+}
+for src in /opt/flash-attn3/*.whl; do
+    [ -e "$src" ] || continue
+    sync_wheel "$src" "flash-attn3"
+done
+for src in /opt/onnxruntime/onnxruntime_gpu-*.whl; do
+    [ -e "$src" ] || continue
+    sync_wheel "$src" "onnxruntime"
+done
+
+# Install FlashAttention-3 from pre-built wheel (built in Docker image for CUDA 13.0)
+echo "Installing flash-attn3 from pre-built wheel..."
+pip install /opt/flash-attn3/*.whl
 
 # Install onnxruntime-gpu from pre-built wheel (built in Docker image for CUDA 13.0)
 echo "Installing onnxruntime-gpu from pre-built wheel..."

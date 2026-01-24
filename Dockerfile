@@ -24,7 +24,8 @@ ENV CUDA_HOME=/usr/local/cuda-13.0
 ENV PATH="$CUDA_HOME/bin:${PATH}"
 ENV LD_LIBRARY_PATH="$CUDA_HOME/lib64:$CUDA_HOME/targets/sbsa-linux/lib:/usr/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH}"
 ENV LIBRARY_PATH="$CUDA_HOME/lib64:$CUDA_HOME/targets/sbsa-linux/lib:/usr/lib/aarch64-linux-gnu:${LIBRARY_PATH}"
-ENV TORCH_CUDA_ARCH_LIST="12.1+PTX"
+ENV TORCH_CUDA_ARCH_LIST="12.1a"
+ENV TRITON_PTXAS_PATH="${CUDA_HOME}/bin/ptxas"
 
 # Add CCCL headers path (libcudacxx) so CUTLASS can find cuda/std/* headers
 # cuda-cccl package installs to targets/sbsa-linux/include
@@ -49,6 +50,7 @@ RUN pip3 install --break-system-packages cmake ninja packaging "numpy>=2.0" && \
         --parallel 6 \
         --nvcc_threads 1 \
         --skip_tests \
+        --compile_no_warning_as_error \
         --allow_running_as_root \
         --cmake_generator Ninja \
         --use_binskim_compliant_compile_flags \
@@ -58,6 +60,29 @@ RUN pip3 install --break-system-packages cmake ninja packaging "numpy>=2.0" && \
     mkdir -p /opt/onnxruntime && \
     cp build/cuda13/Release/dist/onnxruntime_gpu-*.whl /opt/onnxruntime/ && \
     cd / && rm -rf /tmp/onnxruntime-build
+
+
+# =====================================================================
+# Build FlashAttention-3 (Hopper beta) from source for CUDA 13.0 / sm_121
+# Только собираем wheel, установка пойдёт уже в runtime в venv.
+# Требует наличии torch с CUDA 13.0 (используем официальные cu130-колёса).  [oai_citation:1‡GitHub](https://github.com/Dao-AILab/flash-attention)
+# =====================================================================
+WORKDIR /tmp/flash-attn-build
+RUN pip3 install --break-system-packages "packaging" "ninja" && \
+    pip3 install --break-system-packages \
+        "torch==2.9.1+cu130" \
+        --index-url https://download.pytorch.org/whl/cu130 && \
+    git clone --recursive https://github.com/Dao-AILab/flash-attention.git && \
+    cd flash-attention && \
+    git submodule update --init --recursive && \
+    cd hopper && \
+    export CUDA_HOME=/usr/local/cuda-13.0 && \
+    export MAX_JOBS=8 && \
+    export TORCH_CUDA_ARCH_LIST="12.1a" && \
+    python3 -m pip wheel . --no-deps -w dist && \
+    mkdir -p /opt/flash-attn3 && \
+    cp dist/*.whl /opt/flash-attn3/ && \
+    cd / && rm -rf /tmp/flash-attn-build
 
 # Venv will be created at runtime in mounted volume
 ENV VENV_PATH="/workspace/venv"
