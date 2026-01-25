@@ -4,7 +4,6 @@ services:
     container_name: comfyui
     user: "${UID}:${GID}"
     ipc: host
-    shm_size: "64g"
     ports:
       - "${COMFY_PORT:-8188}:${COMFY_PORT:-8188}"
     volumes:
