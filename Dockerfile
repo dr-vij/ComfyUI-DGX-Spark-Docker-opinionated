@@ -64,8 +64,8 @@ RUN pip3 install --break-system-packages cmake ninja packaging "numpy>=2.0" && \
 
 # =====================================================================
 # Build FlashAttention-3 (Hopper beta) from source for CUDA 13.0 / sm_121
-# Только собираем wheel, установка пойдёт уже в runtime в venv.
-# Требует наличии torch с CUDA 13.0 (используем официальные cu130-колёса).  [oai_citation:1‡GitHub](https://github.com/Dao-AILab/flash-attention)
+# Only build the wheel; installation happens at runtime inside the venv.
+# Requires torch with CUDA 13.0 (using official cu130 wheels). [oai_citation:1‡GitHub](https://github.com/Dao-AILab/flash-attention)
 # =====================================================================
 WORKDIR /tmp/flash-attn-build
 RUN pip3 install --break-system-packages "packaging" "ninja" && \
