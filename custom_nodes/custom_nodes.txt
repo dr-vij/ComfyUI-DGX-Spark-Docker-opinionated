@@ -10,16 +10,21 @@ https://github.com/ubisoft/ComfyUI-Chord.git
 https://github.com/phaserblast/ComfyUI-DGXSparkSafetensorsLoader.git
 https://github.com/city96/ComfyUI-GGUF.git
 https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git
-https://github.com/kijai/ComfyUI-KJNodes.git
 https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git
-https://github.com/kijai/ComfyUI-segment-anything-2.git
 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
 https://github.com/filliptm/ComfyUI_Fill-Nodes.git
 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git
 https://github.com/Lightricks/ComfyUI-LTXVideo.git
 https://github.com/cubiq/ComfyUI_essentials.git
-
 https://github.com/Fannovel16/comfyui_controlnet_aux.git
+https://github.com/StableLlama/ComfyUI-basic_data_handling
+https://github.com/sonnybox/ComfyUI-SuperNodes
+
+https://github.com/kijai/ComfyUI-WanAnimatePreprocess
+https://github.com/kijai/ComfyUI-WanVideoWrapper
+# https://github.com/kijai/ComfyUI-segment-anything-2.git
+https://github.com/kijai/ComfyUI-KJNodes.git
+https://github.com/PozzettiAndrea/ComfyUI-SAM3
 
 # ComfyUI Manager - recommended for managing custom nodes via GUI
 https://github.com/ltdrdata/ComfyUI-Manager.git
