@@ -37,6 +37,12 @@ services:
       PIP_CONSTRAINT: /workspace/constraints.txt
       YOLO_CONFIG_DIR: /workspace/cache/ultralytics
       COMFY_PORT: ${COMFY_PORT:-8188}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:${COMFY_PORT:-8188}/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     env_file:
       - .env
     working_dir: /workspace
