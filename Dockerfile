@@ -101,10 +101,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && git checkout dgx-spark \
     && git submodule update --init --recursive \
     \
-    # Provide stub libnvcuvid.so for link stage
-    && echo "void dummy() {}" | gcc -shared \
-        -o /usr/local/cuda-13.0/lib64/stubs/libnvcuvid.so \
-        -x c - -Wl,-soname,libnvcuvid.so.1 \
+    # Provide stub libnvcuvid.so for link stage (must export real cuvid symbols
+    # so the linker adds libnvcuvid.so to DT_NEEDED; at runtime the real
+    # libnvcuvid.so from the host driver replaces this stub)
+    && printf '%s\n' \
+        'void cuvidCreateDecoder(){}' \
+        'void cuvidDestroyDecoder(){}' \
+        'void cuvidDecodePicture(){}' \
+        'void cuvidGetDecoderCaps(){}' \
+        'void cuvidMapVideoFrame64(){}' \
+        'void cuvidUnmapVideoFrame64(){}' \
+        'void cuvidCreateVideoParser(){}' \
+        'void cuvidDestroyVideoParser(){}' \
+        'void cuvidParseVideoData(){}' \
+        'void cuvidCreateVideoSource(){}' \
+        'void cuvidDestroyVideoSource(){}' \
+        'void cuvidCreateVideoSourceW(){}' \
+        'void cuvidGetVideoSourceState(){}' \
+        'void cuvidSetVideoSourceState(){}' \
+        'void cuvidGetSourceVideoFormat(){}' \
+        'void cuvidGetSourceAudioFormat(){}' \
+        'void cuvidCtxLockCreate(){}' \
+        'void cuvidCtxLockDestroy(){}' \
+        'void cuvidCtxLock(){}' \
+        'void cuvidCtxUnlock(){}' \
+        | gcc -shared \
+            -o /usr/local/cuda-13.0/lib64/stubs/libnvcuvid.so \
+            -x c - -Wl,-soname,libnvcuvid.so.1 \
     \
     && mkdir -p build && cd build \
     && cmake .. -G Ninja \
@@ -122,6 +145,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && cp dist/*.whl /opt/decord/ \
     && cd / \
     && rm -rf /tmp/decord-build
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends libopengl0 && rm -rf /var/lib/apt/lists/*
 
 # Venv will be created at runtime in mounted volume
 ENV VENV_PATH="/workspace/venv"
