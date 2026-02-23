@@ -85,6 +85,44 @@ RUN pip3 install --break-system-packages "packaging" "ninja" && \
     cp dist/*.whl /opt/flash-attn3/ && \
     cd / && rm -rf /tmp/flash-attn-build
 
+# =====================================================================
+# Build decord from source (Python 3.12 / Ubuntu 24.04)
+# =====================================================================
+WORKDIR /tmp/decord-build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        pkg-config \
+        libavcodec-dev libavformat-dev libavfilter-dev libavutil-dev libswscale-dev \
+        ffmpeg \
+    && rm -rf /var/lib/apt/lists/* \
+    \
+    # Clone decord fork and checkout dgx-spark branch (with FFmpeg 7 fixes)
+    && git clone --recursive https://github.com/dr-vij/decord.git \
+    && cd decord \
+    && git checkout dgx-spark \
+    && git submodule update --init --recursive \
+    \
+    # Provide stub libnvcuvid.so for link stage
+    && echo "void dummy() {}" | gcc -shared \
+        -o /usr/local/cuda-13.0/lib64/stubs/libnvcuvid.so \
+        -x c - -Wl,-soname,libnvcuvid.so.1 \
+    \
+    && mkdir -p build && cd build \
+    && cmake .. -G Ninja \
+        -DUSE_CUDA=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_CUDA_ARCHITECTURES=121 \
+        -DCMAKE_LIBRARY_PATH=/usr/local/cuda-13.0/lib64/stubs \
+        -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
+        -DCMAKE_C_FLAGS="-Wno-deprecated-declarations" \
+    && ninja -j"$(nproc)" \
+    \
+    && cd ../python \
+    && python3 -m pip wheel . --no-deps -w dist \
+    && mkdir -p /opt/decord \
+    && cp dist/*.whl /opt/decord/ \
+    && cd / \
+    && rm -rf /tmp/decord-build
+
 # Venv will be created at runtime in mounted volume
 ENV VENV_PATH="/workspace/venv"
 ENV PATH="${VENV_PATH}/bin:${PATH}"
