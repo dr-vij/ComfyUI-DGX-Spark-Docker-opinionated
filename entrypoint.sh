@@ -14,7 +14,14 @@ echo "Checking/updating base packages..."
 export PIP_CONSTRAINT="$CONSTRAINTS_FILE"
 pip install --upgrade pip
 pip install torch torchvision torchaudio --pre --index-url https://download.pytorch.org/whl/cu130
-pip install sageattention || true
+if [ "${INSTALL_SAGEATTENTION:-false}" = "true" ]; then
+    echo "Installing sageattention (explicitly enabled)..."
+    pip install sageattention || true
+else
+    echo "Skipping sageattention install (default)."
+    # Keep environment aligned with flash-first startup policy.
+    pip uninstall -y sageattention sageattn3 >/dev/null 2>&1 || true
+fi
 
 # Backup built wheels into mounted directory (update if missing or different)
 WHEELS_BACKUP_DIR="/workspace/SelfBuiltWheels"
@@ -56,6 +63,12 @@ done
 echo "Installing flash-attn3 from pre-built wheel..."
 pip install /opt/flash-attn3/*.whl
 
+# Create compatibility shim so ComfyUI's `import flash_attn` works with FA3 wheels
+# that expose `flash_attn_interface` instead of `flash_attn`.
+if [ "${COMFY_FLASH_ATTN3_SHIM:-true}" = "true" ]; then
+    /workspace/scripts/ensure_flash_attn3_shim.sh "$VENV_PATH" || true
+fi
+
 # Install onnxruntime-gpu from pre-built wheel (built in Docker image for CUDA 13.0)
 echo "Installing onnxruntime-gpu from pre-built wheel..."
 pip install /opt/onnxruntime/onnxruntime_gpu-*.whl
@@ -95,6 +108,11 @@ COMFY_ARGS=(
   --listen 0.0.0.0
   --port "${COMFY_PORT:-8188}"
 )
+
+# Prefer FlashAttention globally (can be disabled with COMFY_FORCE_FLASH_ATTENTION=false).
+if [ "${COMFY_FORCE_FLASH_ATTENTION:-true}" = "true" ]; then
+    COMFY_ARGS+=(--use-flash-attention)
+fi
 
 # Debug mode for custom node bisection:
 # - If COMFY_NODE_WHITELIST is set (comma-separated), load only these nodes.
