@@ -55,7 +55,7 @@ UID=1000
 GID=1000
 UPDATE_DEPS=true
 DISABLE_ALL_CUSTOM_NODES=false
-COMFY_NODE_BLACKLIST=ComfyUI-SeedVR2_VideoUpscaler
+COMFY_NODE_BLACKLIST=ComfyUI-SAM3
 ```
 
 **Parameters:**
@@ -150,7 +150,7 @@ Example blacklist (disable one problematic node, keep the rest):
 
 ```dotenv
 DISABLE_ALL_CUSTOM_NODES=false
-COMFY_NODE_BLACKLIST=ComfyUI-SeedVR2_VideoUpscaler
+COMFY_NODE_BLACKLIST=ComfyUI-SAM3
 ```
 
 Priority:
@@ -250,18 +250,18 @@ This is an intentional pin for DGX Spark; change the line in `entrypoint.sh` if 
 ### 2026-03-07 — v0.1
 
 - Added project versioning (`0.1`)
-- Identified and documented regression source on latest ComfyUI stack: `ComfyUI-SeedVR2_VideoUpscaler`
+- Identified and documented regression source on latest ComfyUI stack: `ComfyUI-SAM3`
 - Added env-based custom node control API:
   - `COMFY_NODE_WHITELIST`
   - `COMFY_NODE_BLACKLIST`
   - `DISABLE_ALL_CUSTOM_NODES`
-- Finalized practical workaround: disable only `ComfyUI-SeedVR2_VideoUpscaler` via blacklist
+- Finalized practical workaround: disable only `ComfyUI-SAM3` via blacklist
 
 If you are on a recent ComfyUI build and get black images / hangs around `Requested to load WanVAE`:
 
 1. Set in `.env`:
    - `DISABLE_ALL_CUSTOM_NODES=false`
-   - `COMFY_NODE_BLACKLIST=ComfyUI-SeedVR2_VideoUpscaler`
+   - `COMFY_NODE_BLACKLIST=ComfyUI-SAM3`
 2. Restart container: `docker compose down && docker compose up`
 3. Re-test the same workflow.
 

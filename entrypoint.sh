@@ -103,10 +103,12 @@ COMFY_ARGS=(
 if [ -n "${COMFY_NODE_WHITELIST:-}" ]; then
     COMFY_ARGS+=(--disable-all-custom-nodes)
     IFS=',' read -ra NODE_LIST <<< "${COMFY_NODE_WHITELIST}"
+    WHITELIST_NODES=()
     for node in "${NODE_LIST[@]}"; do
         node_trimmed="$(echo "$node" | xargs)"
-        [ -n "$node_trimmed" ] && COMFY_ARGS+=(--whitelist-custom-nodes "$node_trimmed")
+        [ -n "$node_trimmed" ] && WHITELIST_NODES+=("$node_trimmed")
     done
+    [ "${#WHITELIST_NODES[@]}" -gt 0 ] && COMFY_ARGS+=(--whitelist-custom-nodes "${WHITELIST_NODES[@]}")
 elif [ -n "${COMFY_NODE_BLACKLIST:-}" ]; then
     COMFY_ARGS+=(--disable-all-custom-nodes)
 
@@ -119,13 +121,15 @@ elif [ -n "${COMFY_NODE_BLACKLIST:-}" ]; then
         [ -n "$node_trimmed" ] && BLACKLIST_SET["$node_trimmed"]=1
     done
 
+    WHITELIST_NODES=()
     for node_path in /workspace/ComfyUI/custom_nodes/*; do
         [ -d "$node_path" ] || continue
         node_name="$(basename "$node_path")"
         [ "$node_name" = "__pycache__" ] && continue
         [ -n "${BLACKLIST_SET[$node_name]:-}" ] && continue
-        COMFY_ARGS+=(--whitelist-custom-nodes "$node_name")
+        WHITELIST_NODES+=("$node_name")
     done
+    [ "${#WHITELIST_NODES[@]}" -gt 0 ] && COMFY_ARGS+=(--whitelist-custom-nodes "${WHITELIST_NODES[@]}")
 elif [ "${DISABLE_ALL_CUSTOM_NODES:-true}" = "true" ]; then
     COMFY_ARGS+=(--disable-all-custom-nodes)
 fi
