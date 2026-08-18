@@ -1,0 +1,40 @@
+# ComfyUI Custom Nodes
+# Each line is a git repository URL to clone
+
+# disabled for now because I have problems with cuda 13.1 and 13.0 on my spark.
+# will enable this one later https://github.com/comfyanonymous/ComfyUI_TensorRT.git
+# comment repos you don't want to clone
+
+https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git
+https://github.com/ubisoft/ComfyUI-Chord.git
+https://github.com/city96/ComfyUI-GGUF.git
+https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git
+https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
+https://github.com/filliptm/ComfyUI_Fill-Nodes.git
+https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git
+https://github.com/Lightricks/ComfyUI-LTXVideo.git
+https://github.com/cubiq/ComfyUI_essentials.git
+https://github.com/Fannovel16/comfyui_controlnet_aux.git
+https://github.com/StableLlama/ComfyUI-basic_data_handling
+https://github.com/sonnybox/ComfyUI-SuperNodes
+https://github.com/jtydhr88/ComfyUI-qwenmultiangle
+
+https://github.com/kijai/ComfyUI-WanAnimatePreprocess
+https://github.com/kijai/ComfyUI-WanVideoWrapper
+https://github.com/kijai/ComfyUI-KJNodes.git
+
+# Remove background
+https://github.com/1038lab/ComfyUI-RMBG.git
+
+# ComfyUI Manager - recommended for managing custom nodes via GUI
+https://github.com/ltdrdata/ComfyUI-Manager.git
+
+# Dr.ViJ (me)
+https://github.com/dr-vij/ComfyUI-SAM3-DGX-Spark.git
+https://github.com/dr-vij/ComfyUI-DrViJ.git
+
+# need this for cool ltx 2.3 workflows.
+https://github.com/rgthree/rgthree-comfy.git
+https://github.com/yolain/ComfyUI-Easy-Use.git
+
+https://github.com/ai-joe-git/ComfyUI-Simple-Prompt-Batcher
