@@ -25,7 +25,7 @@ https://github.com/kijai/ComfyUI-KJNodes.git
 
 # Remove background
 https://github.com/1038lab/ComfyUI-RMBG.git
-
+как
 # ComfyUI Manager - recommended for managing custom nodes via GUI
 https://github.com/ltdrdata/ComfyUI-Manager.git
 

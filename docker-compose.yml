@@ -2,6 +2,7 @@ services:
   comfy:
     build: .
     container_name: comfyui
+    restart: unless-stopped
     user: "${UID}:${GID}"
     ipc: host
     ports:
