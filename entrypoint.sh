@@ -73,10 +73,6 @@ for src in /opt/decord/*.whl; do
     [ -e "$src" ] || continue
     sync_wheel "$src" "decord"
 done
-for src in /opt/comfy-aimdo/comfy_aimdo-*.whl; do
-    [ -e "$src" ] || continue
-    sync_wheel "$src" "comfy-aimdo"
-done
 for src in /opt/sageattention/sageattention-*.whl; do
     [ -e "$src" ] || continue
     sync_wheel "$src" "sageattention"
@@ -84,7 +80,6 @@ done
 prune_wheels /opt/flash-attn flash-attn
 prune_wheels /opt/onnxruntime onnxruntime
 prune_wheels /opt/decord decord
-prune_wheels /opt/comfy-aimdo comfy-aimdo
 prune_wheels /opt/sageattention sageattention
 # Install FlashAttention from pre-built wheel (built in Docker image for CUDA 13.0)
 echo "Installing flash-attn from pre-built wheel..."
@@ -108,16 +103,6 @@ fi
 # Install ComfyUI requirements
 python -m pip install -r /workspace/ComfyUI/requirements.txt
 
-
-
-# Reinstall our local comfy-aimdo wheel after requirements to prevent
-# replacement by platform-stub wheels from PyPI on linux/aarch64.
-if ls /opt/comfy-aimdo/comfy_aimdo-*.whl >/dev/null 2>&1; then
-    echo "Installing comfy-aimdo from pre-built wheel..."
-    python -m pip install --no-deps --force-reinstall /opt/comfy-aimdo/comfy_aimdo-*.whl
-else
-    echo "WARNING: local comfy-aimdo wheel not found in /opt/comfy-aimdo"
-fi
 
 # Clone custom nodes from list
 cd /workspace/ComfyUI/custom_nodes || exit

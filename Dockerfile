@@ -212,28 +212,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && cd / \
     && rm -rf /tmp/decord-build
 
-# =====================================================================
-# Build comfy-aimdo wheel with native aimdo.so for Linux aarch64/CUDA 13.0
-# (PyPI currently provides a stub wheel for this platform without aimdo.so)
-# 0.4.x ships an official build script that fetches funchook 1.1.3, patches
-# Capstone for newer CMake, builds it static, and links aimdo.so directly.
-# =====================================================================
-ARG COMFY_AIMDO_VERSION=v0.4.13
-WORKDIR /tmp
-# `patch` is needed by the upstream build script to fix Capstone's CMakeLists for newer CMake.
-RUN apt-get update && apt-get install -y --no-install-recommends patch \
-    && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /opt/comfy-aimdo && \
-    mkdir -p /tmp/comfy-aimdo-build && \
-    cd /tmp/comfy-aimdo-build && \
-    git clone --depth 1 --branch ${COMFY_AIMDO_VERSION} https://github.com/Comfy-Org/comfy-aimdo.git && \
-    cd comfy-aimdo && \
-    bash scripts/build-linux-aimdo.sh && \
-    pip3 install --break-system-packages build && \
-    python3 -m pip wheel . --no-deps -w dist && \
-    cp dist/comfy_aimdo-*.whl /opt/comfy-aimdo/ && \
-    cd / && rm -rf /tmp/comfy-aimdo-build
-
 
 # Venv will be created at runtime in mounted volume
 ENV VENV_PATH="/workspace/venv"
